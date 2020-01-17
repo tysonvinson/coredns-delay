@@ -9,7 +9,7 @@ COPY . /tmp/coredns-delay
 RUN mkdir -p $(go env GOPATH)/src/github.com/tysonvinson/coredns-delay && mv /tmp/coredns-delay $(go env GOPATH)/src/github.com/tysonvinson/coredns-delay
 RUN mkdir -p  $(go env GOPATH)/src/github.com/coredns/coredns
 RUN git clone https://github.com/coredns/coredns $(go env GOPATH)/src/github.com/coredns/coredns
-RUN cd $(go env GOPATH)/src/github.com/coredns/coredns && echo "delay:github.com/tysonvinson/coredns-delay" >> plugin.cfg && make coredns
+RUN cd $(go env GOPATH)/src/github.com/coredns/coredns && sed -i '1s/^/delay:github.com\/tysonvinson\/coredns-delay\n/' plugin.cfg && make coredns
 RUN cp $(go env GOPATH)/src/github.com/coredns/coredns/coredns /coredns
 COPY Corefile /
 
