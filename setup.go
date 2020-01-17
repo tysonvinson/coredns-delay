@@ -4,6 +4,7 @@ import (
 	"github.com/coredns/coredns/core/dnsserver"
 	"github.com/coredns/coredns/plugin"
 	"github.com/coredns/coredns/plugin/metrics"
+	"strconv"
 
 	"github.com/caddyserver/caddy"
 )
@@ -15,11 +16,15 @@ func init() { plugin.Register("delay", setup) }
 // for parsing any extra options the delay plugin may have. The first token this function sees is "delay".
 func setup(c *caddy.Controller) error {
 	c.Next() // Ignore "delay" and give us the next token.
-	if c.NextArg() {
-		// If there was another token, return an error, because we don't have any configuration.
-		// Any errors returned from this setup function should be wrapped with plugin.Error, so we
-		// can present a slightly nicer error message to the user.
-		return plugin.Error("delay", c.ArgErr())
+	var err error
+	var val int
+	if !c.NextArg() {
+		val = 2000
+	} else {
+		val, err = strconv.Atoi(c.Val())
+		if err != nil {
+			return plugin.Error("delay", c.ArgErr())
+		}
 	}
 
 	// Add a startup function that will -- after all plugins have been loaded -- check if the
