@@ -1,6 +1,6 @@
 .:53 {
     debug
-    delay
+    delay 3000
     forward . 8.8.8.8:53
     log
 }

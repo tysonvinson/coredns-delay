@@ -1,10 +1,11 @@
 package delay
 
 import (
+	"strconv"
+
 	"github.com/coredns/coredns/core/dnsserver"
 	"github.com/coredns/coredns/plugin"
 	"github.com/coredns/coredns/plugin/metrics"
-	"strconv"
 
 	"github.com/caddyserver/caddy"
 )
@@ -14,18 +15,24 @@ func init() { plugin.Register("delay", setup) }
 
 // setup is the function that gets called when the config parser sees the token "delay". Setup is responsible
 // for parsing any extra options the delay plugin may have. The first token this function sees is "delay".
-func setup(c *caddy.Controller) error {
+func setup(c *caddy.Controller) (*Delay, error) {
+	d := &Delay{Delay: 2000}
 	c.Next() // Ignore "delay" and give us the next token.
-	var err error
-	var val int
-	if !c.NextArg() {
-		val = 2000
-	} else {
-		val, err = strconv.Atoi(c.Val())
-		if err != nil {
-			return plugin.Error("delay", c.ArgErr())
-		}
+	args := c.RemainingArgs()
+	if len(args) > 1 {
+		return nil, c.ArgErr()
 	}
+
+	if len(args) == 0 {
+		continue
+	}
+
+	delay, err := strconv.ParseInt(args[0], 10, 32)
+	if err != nil {
+		return nil, err
+	}
+	d.Delay = uint64(delay)
+	return d, nil
 
 	// Add a startup function that will -- after all plugins have been loaded -- check if the
 	// prometheus plugin has been used - if so we will export metrics. We can only register

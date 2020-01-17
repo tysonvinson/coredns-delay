@@ -17,18 +17,19 @@ import (
 var log = clog.NewWithPlugin("delay")
 
 type Delay struct {
-	Next plugin.Handler
+	Delay uint64
+	Next  plugin.Handler
 }
 
 // ServeDNS implements the plugin.Handler interface. This method gets called when delay is used
 // in a Server.
-func (e Delay) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (int, error) {
+func (e *Delay) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (int, error) {
 
 	// Debug log that we've have seen the query. This will only be shown when the debug plugin is loaded.
 	log.Debug("Received response")
 
 	// Pause execution for configured interval
-	time.Sleep(2000 * time.Millisecond)
+	time.Sleep(e.Delay * time.Millisecond)
 
 	// Call next plugin (if any).
 	return plugin.NextOrFailure(e.Name(), e.Next, ctx, w, r)
