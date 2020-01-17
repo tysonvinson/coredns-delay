@@ -4,13 +4,9 @@ package delay
 
 import (
 	"context"
-	"fmt"
-	"io"
-	"os"
 	"time"
 
 	"github.com/coredns/coredns/plugin"
-	"github.com/coredns/coredns/plugin/metrics"
 	clog "github.com/coredns/coredns/plugin/pkg/log"
 
 	"github.com/miekg/dns"
@@ -35,7 +31,7 @@ func (e Delay) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (
 	time.Sleep(2000 * time.Millisecond)
 
 	// Call next plugin (if any).
-	return plugin.NextOrFailure(e.Name(), e.Next, ctx, pw, r)
+	return plugin.NextOrFailure(e.Name(), e.Next, ctx, w, r)
 }
 
 // Name implements the Handler interface.
